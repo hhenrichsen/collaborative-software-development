@@ -118,24 +118,19 @@ export class Mermaid extends Rect {
   @computed()
   protected image(): HTMLImageElement | null {
     const src = this.diagram().trim();
-    console.log('[Mermaid.image] diagram length:', src.length);
     if (!src) return null;
 
     const cachedSvg = Mermaid.svgPool[src];
     if (!cachedSvg) {
-      console.log('[Mermaid.image] no cached SVG, starting render');
       DependencyContext.collectPromise(Mermaid.ensureRendered(src));
       return null;
     }
 
-    console.log('[Mermaid.image] SVG cached, creating image');
     const img = Mermaid.getImage(cachedSvg);
     if (!img.complete) {
-      console.log('[Mermaid.image] image not complete, waiting');
       DependencyContext.collectPromise(
         new Promise<void>(resolve => {
           img.addEventListener('load', () => {
-            console.log('[Mermaid.image] image loaded:', img.naturalWidth, 'x', img.naturalHeight);
             resolve();
           }, {once: true});
         }),
@@ -143,7 +138,6 @@ export class Mermaid extends Rect {
       return null;
     }
 
-    console.log('[Mermaid.image] returning complete image:', img.naturalWidth, 'x', img.naturalHeight);
     return img;
   }
 
